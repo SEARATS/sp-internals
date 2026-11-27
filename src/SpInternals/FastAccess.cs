@@ -1,10 +1,17 @@
+using System;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
 namespace SP.Internals;
 
 /// <summary>Creates delegates to cache and reuse on hot paths.</summary>
-public static class FastAccess
+#if SP_INTERNALS_EMBEDDED
+internal
+#else
+public
+#endif
+static class FastAccess
 {
     public delegate void RefSetter<TTarget, in TValue>(ref TTarget target, TValue value) where TTarget : struct;
 

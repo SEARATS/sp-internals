@@ -27,6 +27,20 @@ Reference `src/SpInternals/SpInternals.csproj` from a mod project and ship
 `SP.Internals.dll` alongside the mod. The library runs inside the game's
 existing Mono process. It has no Anchor Chain or Harmony dependency.
 
+## Embed in your mod DLL
+
+To compile the generated bindings and access helpers into your own DLL,
+import `SpInternals.targets` in your mod's `.csproj`. Adjust the relative path
+to your checkout or submodule. The mod project needs C# 12 or later.
+
+```xml
+<Import Project="../../external/sp-internals/src/SpInternals/SpInternals.targets" />
+```
+
+Use this import in place of the `SP.Internals` project reference. The embedded
+types are internal to your mod, and shipping the mod DLL includes them.
+The assembly selection and local game path settings work in either mode.
+
 ## Use in a mod
 
 ```csharp
@@ -46,9 +60,11 @@ static readonly System.Reflection.MethodInfo SetBindingFromPath =
 
 Each generated type has a `Type.Info` and groups for its declared fields,
 methods, constructors, properties and events. The groups cover private
-members, nested types and compiler-generated definitions. IntelliSense and
-`src/SpInternals/obj/<Configuration>/netstandard2.1/Bindings.g.cs` show the
-original metadata signatures. Overloads include parameter type names in their
+members, nested types and compiler-generated definitions. Build once in
+your editor's active configuration to enable completion. IntelliSense
+shows the original signatures, which you can also browse in
+`obj/<Configuration>/<TargetFramework>/Bindings.g.cs` under the project
+that generates them. Overloads include parameter type names in their
 identifiers. A numeric suffix disambiguates names that still collide.
 
 Use `Bind<TDelegate>()` to cache a method delegate or

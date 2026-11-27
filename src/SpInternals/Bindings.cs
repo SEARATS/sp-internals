@@ -1,8 +1,16 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 namespace SP.Internals;
 
-public class AssemblyBinding(string name, Guid moduleId)
+#if SP_INTERNALS_EMBEDDED
+internal
+#else
+public
+#endif
+class AssemblyBinding(string name, Guid moduleId)
 {
     private readonly Lazy<Module> module = new(() =>
     {
@@ -16,14 +24,24 @@ public class AssemblyBinding(string name, Guid moduleId)
     public Module Module => module.Value;
 }
 
-public class TypeBinding(AssemblyBinding assembly, int token)
+#if SP_INTERNALS_EMBEDDED
+internal
+#else
+public
+#endif
+class TypeBinding(AssemblyBinding assembly, int token)
 {
     private readonly Lazy<Type> type = new(() => assembly.Module.ResolveType(token));
 
     public Type Info => type.Value;
 }
 
-public class MemberBinding<TMember>(TypeBinding owner, int token) where TMember : MemberInfo
+#if SP_INTERNALS_EMBEDDED
+internal
+#else
+public
+#endif
+class MemberBinding<TMember>(TypeBinding owner, int token) where TMember : MemberInfo
 {
     private const BindingFlags Declared = BindingFlags.DeclaredOnly | BindingFlags.Public |
         BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance;

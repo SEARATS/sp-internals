@@ -44,7 +44,12 @@ static void Generate(string output, string[] inputs)
             .OrderBy(type => type.FullName, StringComparer.Ordinal).ToArray();
         var assemblyId = names.Take(assembly.Name.Name);
         source.AppendLine($$"""
-            public static class {{assemblyId}}
+            #if SP_INTERNALS_EMBEDDED
+            internal
+            #else
+            public
+            #endif
+            static class {{assemblyId}}
             {
                 private static readonly AssemblyBinding Binding = new({{JsonSerializer.Serialize(assembly.Name.Name)}}, new Guid("{{module.Mvid}}"));
             """);

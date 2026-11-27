@@ -1,0 +1,30 @@
+<Project>
+  <PropertyGroup>
+    <SpInternalsEmbed Condition="'$(SpInternalsEmbed)' == ''">true</SpInternalsEmbed>
+    <DefineConstants Condition="'$(SpInternalsEmbed)' == 'true'">$(DefineConstants);SP_INTERNALS_EMBEDDED</DefineConstants>
+    <SeaPowerDir Condition="'$(SeaPowerDir)' == ''">$(SEA_POWER_DIR)</SeaPowerDir>
+    <SeaPowerDir Condition="'$(SeaPowerDir)' == ''">C:/Program Files (x86)/Steam/steamapps/common/Sea Power</SeaPowerDir>
+    <GameManaged Condition="'$(GameManaged)' == ''">$(SeaPowerDir)/Sea Power_Data/Managed</GameManaged>
+    <InternalsAssemblies Condition="'$(InternalsAssemblies)' == ''">Seapower-Scripts;Noesis.NoesisGUI;Assets;Libraries;Plugins</InternalsAssemblies>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="$(MSBuildThisFileDirectory)../../tools/Generate/Generate.csproj" ReferenceOutputAssembly="false"
+                      OutputItemType="_SpInternalsGenerator" SkipGetTargetFrameworkProperties="true" PrivateAssets="all" Private="false" />
+    <_SpInternalsAssembly Include="$(InternalsAssemblies);$(InternalsExtraAssemblies)" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(SpInternalsEmbed)' == 'true'">
+    <Compile Include="$(MSBuildThisFileDirectory)Bindings.cs;$(MSBuildThisFileDirectory)FastAccess.cs"
+             Link="SP.Internals/%(Filename)%(Extension)" />
+  </ItemGroup>
+  <Target Name="_SpInternalsGenerate" BeforeTargets="CoreCompile" DependsOnTargets="ResolveProjectReferences">
+    <PropertyGroup>
+      <_SpInternalsSource>$(IntermediateOutputPath)Bindings.g.cs</_SpInternalsSource>
+    </PropertyGroup>
+    <Exec Condition="'$(DesignTimeBuild)' != 'true'"
+          Command="dotnet &quot;@(_SpInternalsGenerator)&quot; &quot;$(_SpInternalsSource)&quot; @(_SpInternalsAssembly->'&quot;$(GameManaged)/%(Identity).dll&quot;', ' ')" />
+    <ItemGroup Condition="Exists('$(_SpInternalsSource)')">
+      <Compile Include="$(_SpInternalsSource)" />
+      <FileWrites Include="$(_SpInternalsSource)" Condition="'$(DesignTimeBuild)' != 'true'" />
+    </ItemGroup>
+  </Target>
+</Project>
