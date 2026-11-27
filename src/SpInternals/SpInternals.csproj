@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>SP.Internals</AssemblyName>
+    <Version>0.1.0</Version>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <SeaPowerDir Condition="'$(SeaPowerDir)' == ''">$(SEA_POWER_DIR)</SeaPowerDir>
+    <SeaPowerDir Condition="'$(SeaPowerDir)' == ''">C:/Program Files (x86)/Steam/steamapps/common/Sea Power</SeaPowerDir>
+    <GameManaged Condition="'$(GameManaged)' == ''">$(SeaPowerDir)/Sea Power_Data/Managed</GameManaged>
+    <InternalsAssemblies Condition="'$(InternalsAssemblies)' == ''">Seapower-Scripts;Noesis.NoesisGUI;Assets;Libraries;Plugins</InternalsAssemblies>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../tools/Generate/Generate.csproj" ReferenceOutputAssembly="false"
+                      OutputItemType="InternalsGenerator" SkipGetTargetFrameworkProperties="true" PrivateAssets="all" Private="false" />
+    <InternalsAssembly Include="$(InternalsAssemblies);$(InternalsExtraAssemblies)" />
+  </ItemGroup>
+  <Target Name="GenerateInternals" BeforeTargets="CoreCompile" DependsOnTargets="ResolveProjectReferences" Condition="'$(DesignTimeBuild)' != 'true'">
+    <PropertyGroup>
+      <InternalsSource>$(IntermediateOutputPath)Bindings.g.cs</InternalsSource>
+    </PropertyGroup>
+    <Exec Command="dotnet &quot;@(InternalsGenerator)&quot; &quot;$(InternalsSource)&quot; @(InternalsAssembly->'&quot;$(GameManaged)/%(Identity).dll&quot;', ' ')" />
+    <ItemGroup>
+      <Compile Include="$(InternalsSource)" />
+      <FileWrites Include="$(InternalsSource)" />
+    </ItemGroup>
+  </Target>
+  <Target Name="IncludeGeneratedBindings" BeforeTargets="CoreCompile"
+          Condition="'$(DesignTimeBuild)' == 'true' And Exists('$(IntermediateOutputPath)Bindings.g.cs')">
+    <ItemGroup>
+      <Compile Include="$(IntermediateOutputPath)Bindings.g.cs" />
+    </ItemGroup>
+  </Target>
+</Project>
