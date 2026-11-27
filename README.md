@@ -5,6 +5,12 @@ metadata from your local installation and generates a .NET Standard 2.1 library
 for mods. The default inputs are `Seapower-Scripts`, `Noesis.NoesisGUI`,
 `Assets`, `Libraries` and `Plugins`.
 
+## Releases
+
+Merges collect under `## Unreleased` in the [CHANGELOG](CHANGELOG.md) and never bump the version.
+A release is a deliberate snapshot: version, tag, DLL built from the tag, GitHub release.
+Pin a release tag when you use this repo as a submodule. Steps: [docs/release-process.md](docs/release-process.md).
+
 ## Build
 
 Install the .NET 10 SDK and run this from the checkout.
